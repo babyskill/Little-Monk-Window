@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-capability",
+  "description": "Default capability for Little Monk Window",
+  "windows": ["pet"],
+  "permissions": ["core:default"],
+  "platforms": ["linux", "macOS", "windows"]
+}

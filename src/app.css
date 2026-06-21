@@ -1,0 +1,36 @@
+:root {
+  color-scheme: light;
+  --ink: rgba(34, 40, 39, 0.96);
+  --ink-soft: rgba(34, 40, 39, 0.72);
+  --paper: rgba(250, 244, 232, 0.82);
+  --paper-strong: rgba(255, 248, 236, 0.96);
+  --leaf: rgba(92, 122, 71, 0.92);
+  --leaf-soft: rgba(92, 122, 71, 0.18);
+  --shadow: rgba(10, 12, 12, 0.24);
+  --glow: rgba(174, 148, 91, 0.34);
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  color: var(--ink);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}

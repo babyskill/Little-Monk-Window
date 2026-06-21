@@ -1,117 +1,212 @@
-# Implementation Plan — LittleMonkWindow (Desktop Widget for Windows)
+# Implementation Plan — LittleMonkWindow
 
-This plan outlines the architecture, technology stack, and implementation steps to build the **LittleMonkWindow** desktop widget for Windows using Rust and Tauri, heavily inspired by the design and behavior of [LiteMonk (AgentPet)](file:///Users/trungkientn/Dev2/MacOS/agentpet) on macOS.
+Desktop companion app for macOS built with Rust + Tauri. The app shows a small monk floating on screen and periodically displays a Buddhist verse bubble from a bundled scripture library.
 
----
+Source reference: `/Users/appdexter/Dev/Little-Monk-Mac`
 
-## Technical Stack & Architecture
+## Current Findings
 
-- **Backend**: Rust + Tauri v2
-  - Lightweight system tray management.
-  - Native window control (transparency, position saving, window styling, click-through toggling).
-  - File system CRUD for custom pet assets and configuration persistence.
-- **Frontend**: Vite + Vanilla TypeScript (or Svelte for structured component state) + TailwindCSS/Vanilla CSS.
-  - Transparent overlay rendering the animated monk sprite and quote bubble.
-  - Sprite slicing via HTML5 Canvas API (matching macOS's alpha gutter-based slicing algorithm).
-  - Audio playback via Web Audio API (low latency bonk sound).
-- **Assets**: Imported from LiteMonk macOS (`Dhammapada.json`, `bonk_1.mp3`, `bell.mp3`, and pet spritesheets).
+- The source macOS app is a SwiftPM/AppKit + SwiftUI app named `AgentPet`.
+- The active source already has the core behavior we need:
+  - floating transparent `NSPanel` in `Sources/App/PetWindowController.swift`
+  - quote timer and tap reactions in `Sources/App/PetController.swift`
+  - Dhammapada loading/custom persistence in `Sources/App/DhammapadaStore.swift`
+  - deterministic 5-minute quote rotation in `Sources/App/IdleBoost.swift`
+  - sprite pack slicing in `Sources/App/SpriteSlicer.swift`
+- Reusable bundled resources:
+  - `Sources/App/Resources/Dhammapada.json`
+  - `Sources/App/Resources/Lotus.svg`
+  - `Sources/App/Resources/bell.mp3`
+  - `Sources/App/Resources/bonk_1.mp3`
+  - `assets/icon.png`
+- The current `Little-Monk-Window` repo is not scaffolded yet. It only has project metadata and planning docs.
+- `CODEBASE.md` is currently a generated placeholder and should be refreshed after scaffold.
 
----
+## Product Direction
 
-## User Review Required
+MVP should be calm and small:
 
-> [!IMPORTANT]
-> **Windows Click-Through (Mouse Passthrough) Behavior**
-> To make the background of the widget transparent and click-through (so users can interact with folders/apps behind the widget, while still clicking the monk/bubble), we must dynamically toggle the cursor events:
-> - **Default State**: Mouse ignores window events (`set_ignore_cursor_events(true)`).
-> - **Active State (Hovering Monk or Bubble)**: Mouse captures window events (`set_ignore_cursor_events(false)`).
-> We will implement this by detecting mouse coordinates relative to the DOM elements in Frontend, then invoking a Rust command to toggle click-through.
-> Please review if this approach meets your expectations or if you prefer a different mechanism.
+- A transparent, borderless, always-on-top floating monk window.
+- A speech bubble that shows one Dhammapada verse every interval.
+- Default interval: 5 minutes.
+- Default display duration: 20 seconds.
+- Tapping the monk shows a short reaction and can play `bonk_1.mp3`.
+- Tray/menu controls: Show/Hide, Toggle Always On Top, Quit.
+- Settings window is Phase 2 unless needed for testing.
 
-> [!NOTE]
-> **Tech Stack Choice for Frontend**
-> We recommend using **Vite + Svelte + Vanilla CSS** for the frontend because it yields a very compact binary, has minimal memory footprint, and provides excellent reactive data binding for sprite animation loops, settings, and custom quote additions.
+## Key Technical Decision
 
----
+Use Tauri v2 + Svelte + Rust.
 
-## Open Questions
+Why:
 
-> [!WARNING]
-> 1. **Pet Assets Loading**: Should we bundle a default Little Monk asset pack inside the binary (or App resources), or do we download it on the first launch similar to the macOS version?
-> 2. **Mindfulness Bell Service**: On Windows, do we want to support native Windows notifications alongside the audio chime when the Mindfulness Bell triggers?
+- Tauri gives native window control and packaging with a small footprint.
+- Rust is the right place for quote scheduling, settings persistence, and native window commands.
+- Svelte keeps the transparent overlay UI simple and reactive.
 
----
+Trade-off:
 
-## Proposed Changes
+- Tauri cannot perfectly match AppKit `NSPanel` behavior out of the box. We may need a small macOS-native helper later for `canJoinAllSpaces`, non-activating panel behavior, or full-screen Space behavior.
+- Transparent webview on macOS may require `macOSPrivateApi`, which is acceptable for direct DMG/notarized distribution but risky for Mac App Store distribution.
 
-We will bootstrap the Tauri project inside `/Users/trungkientn/Dev2/MacOS/little-monk-window`.
+## Proposed Architecture
 
-### Core Project Bootstrapping
+```text
+src-tauri/
+├── Cargo.toml
+├── tauri.conf.json
+├── resources/
+│   ├── Dhammapada.json
+│   ├── bell.mp3
+│   └── bonk_1.mp3
+└── src/
+    ├── main.rs
+    ├── app_state.rs
+    ├── commands.rs
+    ├── quotes.rs
+    ├── scheduler.rs
+    ├── settings.rs
+    ├── tray.rs
+    └── window.rs
 
-#### [NEW] [tauri.conf.json](file:///Users/trungkientn/Dev2/MacOS/little-monk-window/src-tauri/tauri.conf.json)
-Configure Tauri settings:
-- Transparency enabled (`"transparent": true`).
-- Window decorations disabled (`"decorations": false`).
-- Always on top (`"alwaysOnTop": true`).
-- Skip taskbar (`"skipTaskbar": true`).
-- Configure two windows: `main` (floating pet widget) and `settings` (hidden by default).
-- Configure System Tray settings.
+src/
+├── App.svelte
+├── components/
+│   ├── MonkSprite.svelte
+│   ├── PetWindow.svelte
+│   ├── QuoteBubble.svelte
+│   └── ReactionBubble.svelte
+├── lib/
+│   ├── audio.ts
+│   ├── geometry.ts
+│   ├── spriteSlicer.ts
+│   └── tauriApi.ts
+└── assets/
+    ├── lotus.svg
+    └── monk/
+```
 
-#### [NEW] [Cargo.toml](file:///Users/trungkientn/Dev2/MacOS/little-monk-window/src-tauri/Cargo.toml)
-Add necessary dependencies:
-- `tauri` (v2 with tray-icon and window APIs).
-- `serde` and `serde_json` (for manifest parsing).
-- `window-shadows` (for the Settings window).
+## Window Behavior
 
-#### [NEW] [main.rs](file:///Users/trungkientn/Dev2/MacOS/little-monk-window/src-tauri/src/main.rs)
-- Implement Tauri commands:
-  - `toggle_click_through(ignore: bool)`: calls `window.set_ignore_cursor_events(ignore)`.
-  - `start_dragging()`: calls `window.start_dragging()`.
-  - `load_dhammapada_quotes()`: returns quote database.
-  - `save_settings()` / `load_settings()`.
-- System Tray setup: Add context menu (Show Settings, Toggle Mute, Exit).
+Tauri window config target:
 
----
+```json
+{
+  "label": "pet",
+  "width": 320,
+  "height": 380,
+  "transparent": true,
+  "decorations": false,
+  "alwaysOnTop": true,
+  "skipTaskbar": true,
+  "resizable": false,
+  "shadow": false,
+  "focus": false,
+  "visible": true
+}
+```
 
-### Frontend Components (Vite + Svelte/TS)
+Click-through strategy:
 
-#### [NEW] [App.svelte](file:///Users/trungkientn/Dev2/MacOS/little-monk-window/src/App.svelte)
-- High-level layout of the widget:
-  - Speech bubble (QuoteBubble).
-  - Tap button containing the monk sprite (PetView).
-  - Reaction message text capsule.
-- Monitors mouse position to dynamically toggle `toggle_click_through`.
+- MVP: fail-safe interactive window, with transparent background visually clear.
+- Next: hover/hit-rect toggling via Rust command `set_ignore_cursor_events(ignore: bool)`.
+- Avoid per-pixel click-through assumptions. Tauri toggles the whole window, so geometry must be carefully tested on Retina displays.
 
-#### [NEW] [SpriteSlicer.ts](file:///Users/trungkientn/Dev2/MacOS/little-monk-window/src/lib/SpriteSlicer.ts)
-Port the Swift `SpriteSlicer` logic to JavaScript using Canvas context pixel manipulation:
-- Detect rows and columns based on alpha transparent channels.
-- Generate image data frames for animation rendering.
+## Quote Logic
 
-#### [NEW] [PetController.ts](file:///Users/trungkientn/Dev2/MacOS/little-monk-window/src/lib/PetController.ts)
-Implement the core logic:
-- Handle clicking (bonk sound playback, play hit animation with elastic scale bounce).
-- Timer to rotate Dhammapada quotes.
-- Trigger consecutive click tiers (reactions: `consecutivePets >= 6 ? tier 2 ...`).
+Port from Swift:
 
----
+- Load bundled `Dhammapada.json`.
+- Use Vietnamese as primary because source has 423 Vietnamese verses and only a few English translations.
+- Select verse by time slot:
 
-### Assets Migration
+```text
+slot = unix_timestamp / (5 * 60)
+verse = verses[slot % verses.length]
+```
 
-#### [NEW] [Dhammapada.json](file:///Users/trungkientn/Dev2/MacOS/little-monk-window/src/assets/Dhammapada.json)
-Copy multilingual Dhammapada text from [Dhammapada.json](file:///Users/trungkientn/Dev2/MacOS/agentpet/Sources/App/Resources/Dhammapada.json).
+- Store custom quotes later in app config dir, not inside the bundle.
+- Keep attribution fields visible in settings/about before any public release.
 
-#### [NEW] [Audio Assets](file:///Users/trungkientn/Dev2/MacOS/little-monk-window/src/assets/)
-Copy `bonk_1.mp3` and `bell.mp3` sound files.
+## Asset Strategy
 
----
+Use immediately:
+
+- `Dhammapada.json`
+- `Lotus.svg`
+- `bell.mp3`
+- `bonk_1.mp3`
+- `assets/icon.png`
+
+Needs decision:
+
+- Default monk character asset.
+
+The Swift app does not bundle a monk spritesheet in active resources. It supports imported/downloaded pet packs through `pet.json + spritesheetPath`. For this Tauri app, choose one:
+
+1. Bundle a new original monk sprite with clear license.
+2. Generate a simple original monk image/spritesheet for MVP.
+3. Reuse remote pet catalog only as optional import, not as bundled default.
+
+Recommended: generate or draw an original monk asset for MVP, then keep the existing pet pack importer for Phase 2.
+
+## Phases
+
+### Phase A — Infrastructure
+
+- Scaffold Tauri v2 + Svelte.
+- Configure transparent `pet` window.
+- Add tray menu.
+- Copy bundled quote/audio/icon resources.
+- Add Rust modules: quotes, settings, window commands.
+- Verification: `npm run build`, `cargo fmt --check`, `cargo test`.
+
+### Phase B — UI Shell
+
+- Render monk placeholder or generated original monk asset.
+- Render quote bubble with mock/current quote.
+- Render tap reaction capsule.
+- Keep fixed 320x380 window to avoid resize drift.
+- Manual checkpoint: user visually checks transparent floating UI on macOS.
+
+### Phase C — Logic
+
+- Rust scheduler emits quote updates.
+- Frontend receives quote events.
+- Tap interaction plays sound and reaction.
+- Add persistence for size, visibility, always-on-top, interval.
+- Add click-through hit-rect after UI shell is approved.
+
+## Risks
+
+- `macOSPrivateApi` can affect Mac App Store eligibility.
+- Tauri always-on-top may not match AppKit `NSPanel` across all Spaces/full-screen apps.
+- Whole-window click-through can make the monk unclickable if hover geometry is wrong.
+- Retina coordinate conversion can break hit-rect detection.
+- Dhammapada translations and sound assets need license/attribution review before commercial/public release.
+- Pet catalog artwork should not be bundled without explicit license verification.
 
 ## Verification Plan
 
-### Automated Tests
-- Setup unit tests for `SpriteSlicer` in JS/TS to ensure spritesheet coordinates are sliced correctly.
-- Test JSON loading in Rust.
+Automated:
 
-### Manual Verification
-1. **Window Transparency & Hovering**: Verify the background of the widget is fully transparent. Check that clicking on transparent areas clicks *through* to underlying desktop elements.
-2. **Interaction**: Hover over the Monk, click to bonk, observe the elastic scale effect, bonk audio, and reaction speech bubbles.
-3. **Tray Icon**: Check that the app shows up in the System Tray and can open the Settings screen or close the app.
+```bash
+npm run build
+cd src-tauri && cargo fmt --check
+cd src-tauri && cargo clippy --all-targets --all-features -- -D warnings
+cd src-tauri && cargo test
+```
+
+Manual:
+
+- `npm run tauri dev`
+- Window is transparent and borderless.
+- Monk stays visible above normal desktop windows.
+- Quote appears and hides on schedule.
+- Tap reaction works and sound plays.
+- Tray menu can show/hide and quit.
+- Later: transparent areas click through while monk/bubble remain interactive.
+
+## Immediate Next Step
+
+Start Phase A by scaffolding Tauri v2 + Svelte in this repo, then copy `Dhammapada.json`, `Lotus.svg`, `bell.mp3`, `bonk_1.mp3`, and `icon.png` from `/Users/appdexter/Dev/Little-Monk-Mac`.
