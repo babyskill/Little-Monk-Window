@@ -1,28 +1,72 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { listen } from '@tauri-apps/api/event';
+  import { invoke } from '@tauri-apps/api/core';
+  import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
   import PetWindow from './components/PetWindow.svelte';
-  import { playBell } from './lib/audio';
+  import SettingsWindow from './components/SettingsWindow.svelte';
+  import { playBell, playBonk } from './lib/audio';
   import type { QuotePayload } from './lib/quote';
+  import { defaultSettings, type AppSettings } from './lib/settings';
 
-  let quote: QuotePayload | null = null;
-  let bubbleVisible = true;
+  let quote: QuotePayload | null = {
+    id: 'startup',
+    chapterNumber: 1,
+    verseNumber: 1,
+    chapterTitle: 'Phẩm Song Yếu',
+    text: 'Ý dẫn đầu các pháp,\nÝ làm chủ, ý tạo.',
+    translator: 'HT. Thích Minh Châu',
+    source: 'startup',
+  };
+  let settings: AppSettings = { ...defaultSettings };
   let reaction = '';
   let ready = false;
+  const isSettingsWindow = getCurrentWebviewWindow().label === 'settings';
+
+  async function loadSettings() {
+    try {
+      settings = await invoke<AppSettings>('get_settings');
+    } catch {
+      settings = { ...defaultSettings };
+    }
+  }
 
   onMount(() => {
     const unlistenTasks: Array<() => void> = [];
 
     void (async () => {
+      await loadSettings();
+
+      let hasInitialized = false;
       const unlistenQuote = await listen<QuotePayload>('monk:quote', (event) => {
         quote = event.payload;
-        bubbleVisible = true;
         ready = true;
-        playBell();
+
+        if (hasInitialized) {
+          if (settings.bell_sound_enabled) {
+            if (settings.bell_sound === 'bonk') {
+              playBonk(settings.bell_volume);
+            } else {
+              playBell(settings.bell_volume, settings.bell_repeat_count);
+            }
+          }
+        } else {
+          hasInitialized = true;
+        }
       });
 
-      const unlistenClear = await listen('monk:clear', () => {
-        bubbleVisible = false;
+      const unlistenBell = await listen('monk:bell', () => {
+        if (settings.bell_enabled && settings.bell_sound_enabled) {
+          if (settings.bell_sound === 'bonk') {
+            playBonk(settings.bell_volume);
+          } else {
+            playBell(settings.bell_volume, settings.bell_repeat_count);
+          }
+        }
+      });
+
+      const unlistenSettings = await listen<AppSettings>('settings:changed', (event) => {
+        settings = event.payload;
       });
 
       const unlistenReaction = await listen<string>('monk:reaction', (event) => {
@@ -32,7 +76,7 @@
         }, 1800);
       });
 
-      unlistenTasks.push(unlistenQuote, unlistenClear, unlistenReaction);
+      unlistenTasks.push(unlistenQuote, unlistenBell, unlistenSettings, unlistenReaction);
     })();
 
     return () => {
@@ -48,7 +92,18 @@
 </svelte:head>
 
 <div class="app-shell" class:ready>
-  <PetWindow {quote} {bubbleVisible} bind:reaction />
+  {#if isSettingsWindow}
+    <SettingsWindow {settings} />
+  {:else}
+    <PetWindow
+      {quote}
+      bind:reaction
+      petSize={settings.pet_size}
+      quoteFontSize={settings.font_size}
+      showQuote={settings.show_quote}
+      showTapMessage={settings.show_tap_message}
+    />
+  {/if}
 </div>
 
 <style>

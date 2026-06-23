@@ -4,7 +4,16 @@ pub fn configure_main_window(app: &AppHandle, always_on_top: bool) {
     if let Some(window) = app.get_webview_window("pet") {
         toggle_click_through(&window, false);
         let _ = window.set_always_on_top(always_on_top);
+        let _ = window.center();
         let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
+pub fn configure_settings_window(app: &AppHandle) {
+    if let Some(window) = app.get_webview_window("settings") {
+        let _ = window.set_always_on_top(false);
+        let _ = window.hide();
     }
 }
 
@@ -16,6 +25,13 @@ pub fn set_window_visible(app: &AppHandle, visible: bool) {
         } else {
             let _ = window.hide();
         }
+    }
+}
+
+pub fn show_settings_window(app: &AppHandle) {
+    if let Some(window) = app.get_webview_window("settings") {
+        let _ = window.show();
+        let _ = window.set_focus();
     }
 }
 

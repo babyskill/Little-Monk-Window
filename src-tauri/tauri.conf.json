@@ -6,7 +6,7 @@
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devUrl": "http://localhost:5173",
+    "devUrl": "http://localhost:1420",
     "frontendDist": "../dist"
   },
   "app": {
@@ -19,8 +19,8 @@
       {
         "label": "pet",
         "title": "Little Monk Window",
-        "width": 360,
-        "height": 460,
+        "width": 430,
+        "height": 330,
         "resizable": false,
         "fullscreen": false,
         "decorations": false,
@@ -29,6 +29,20 @@
         "skipTaskbar": true,
         "shadow": false,
         "visible": true
+      },
+      {
+        "label": "settings",
+        "title": "Little Monk Settings",
+        "width": 760,
+        "height": 680,
+        "resizable": false,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false,
+        "alwaysOnTop": false,
+        "skipTaskbar": true,
+        "shadow": true,
+        "visible": false
       }
     ]
   },
