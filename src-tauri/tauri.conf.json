@@ -33,9 +33,9 @@
       {
         "label": "settings",
         "title": "Little Monk Settings",
-        "width": 760,
-        "height": 680,
-        "resizable": false,
+        "width": 1060,
+        "height": 900,
+        "resizable": true,
         "fullscreen": false,
         "decorations": true,
         "transparent": false,

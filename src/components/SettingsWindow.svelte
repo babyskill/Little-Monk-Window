@@ -132,8 +132,11 @@
   .settings {
     height: 100vh;
     box-sizing: border-box;
-    overflow: auto;
-    padding: 18px;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: 12px;
+    overflow: hidden;
+    padding: 16px;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
     color: rgba(243, 242, 247, 0.95);
     background:
@@ -143,15 +146,15 @@
 
   .hero {
     display: grid;
-    grid-template-columns: 1.1fr 1fr;
+    grid-template-columns: 1fr 0.9fr;
     gap: 18px;
     align-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 0;
   }
 
   .hero-copy h1 {
-    margin: 4px 0 8px;
-    font-size: 30px;
+    margin: 2px 0 8px;
+    font-size: 28px;
     line-height: 1;
   }
 
@@ -171,21 +174,21 @@
 
   .hero-preview {
     position: relative;
-    min-height: 250px;
+    min-height: 190px;
     display: grid;
     justify-items: center;
     align-items: end;
   }
 
   .hero-preview :global(.bubble) {
-    transform: scale(0.82);
+    transform: scale(0.72);
     transform-origin: center bottom;
   }
 
   .hero-monk {
     position: absolute;
     bottom: 0;
-    transform: translateY(10px);
+    transform: translateY(6px) scale(0.9);
     pointer-events: none;
   }
 
@@ -219,9 +222,11 @@
   }
 
   .panel {
-    margin-top: 14px;
+    min-height: 0;
+    margin-top: 0;
     border-radius: 18px;
     padding: 18px;
+    overflow: auto;
     background: rgba(255, 255, 255, 0.045);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
@@ -295,7 +300,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 14px;
+    margin-top: 0;
   }
 
   .footer .ghost,
