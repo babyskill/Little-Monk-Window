@@ -45,6 +45,16 @@ fn update_settings(
 }
 
 #[tauri::command]
+fn show_settings_window(app: AppHandle) {
+    window::show_settings_window(&app);
+}
+
+#[tauri::command]
+fn quit_app(app: AppHandle) {
+    app.exit(0);
+}
+
+#[tauri::command]
 fn list_verses(quotes: State<'_, SharedQuotes>) -> Result<Vec<DhammapadaVerse>, String> {
     quotes
         .0
@@ -176,6 +186,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_settings,
             update_settings,
+            show_settings_window,
+            quit_app,
             list_verses,
             current_quote,
             get_next_quote,

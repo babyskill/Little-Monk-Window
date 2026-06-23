@@ -98,8 +98,7 @@
     <PetWindow
       {quote}
       bind:reaction
-      petSize={settings.pet_size}
-      quoteFontSize={settings.font_size}
+      bind:settings
       showQuote={settings.show_quote}
       showTapMessage={settings.show_tap_message}
     />

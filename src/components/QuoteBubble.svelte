@@ -20,9 +20,11 @@
 <style>
   .bubble {
     position: relative;
-    width: 360px;
-    min-height: 112px;
-    padding: 29px 48px 24px;
+    max-width: 380px;
+    width: fit-content;
+    min-width: 260px;
+    min-height: 90px;
+    padding: 22px 36px 18px;
     border-radius: 22px;
     box-sizing: border-box;
     background: rgba(255, 250, 242, 0.82);
@@ -92,12 +94,12 @@
   }
 
   .quote-mark-open {
-    top: 13px;
-    left: 22px;
+    top: 8px;
+    left: 14px;
   }
 
   .quote-mark-close {
-    right: 22px;
-    bottom: 6px;
+    right: 14px;
+    bottom: 2px;
   }
 </style>

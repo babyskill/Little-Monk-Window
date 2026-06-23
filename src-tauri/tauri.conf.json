@@ -20,7 +20,7 @@
         "label": "pet",
         "title": "Little Monk Window",
         "width": 430,
-        "height": 330,
+        "height": 380,
         "resizable": false,
         "fullscreen": false,
         "decorations": false,
