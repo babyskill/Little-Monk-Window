@@ -2,7 +2,6 @@ export type AppSettings = {
   always_on_top: boolean;
   show_quote: boolean;
   show_idle_message: boolean;
-  show_tap_message: boolean;
   quote_interval_secs: number;
   quote_visible_secs: number;
   pet_size: number;
@@ -24,7 +23,6 @@ export const defaultSettings: AppSettings = {
   always_on_top: true,
   show_quote: true,
   show_idle_message: true,
-  show_tap_message: true,
   quote_interval_secs: 300,
   quote_visible_secs: 20,
   pet_size: 145,

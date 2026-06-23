@@ -107,10 +107,6 @@
             on:change={queueSave}
           />
         </label>
-        <label class="toggle">
-          <span>Show reaction message on tap</span>
-          <input type="checkbox" bind:checked={draft.show_tap_message} on:change={queueSave} />
-        </label>
       </div>
     {:else if tab === 'bell'}
       <BellSettings bind:draft {queueSave} />

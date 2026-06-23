@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { AppSettings } from '../../lib/settings';
-  import { playBell, playBonk } from '../../lib/audio';
+  import { playSelectedBellSound } from '../../lib/audio';
 
   export let draft: AppSettings;
   export let queueSave: () => void;
@@ -22,12 +22,7 @@
   }
 
   function previewSound() {
-    if (draft.bell_sound === 'bonk') {
-      playBonk(draft.bell_volume);
-      return;
-    }
-
-    playBell(draft.bell_volume, draft.bell_repeat_count);
+    playSelectedBellSound(draft.bell_sound, draft.bell_volume, draft.bell_repeat_count);
   }
 </script>
 

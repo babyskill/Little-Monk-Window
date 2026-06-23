@@ -5,7 +5,7 @@
   import MonkSprite from './MonkSprite.svelte';
   import QuoteBubble from './QuoteBubble.svelte';
   import ReactionBubble from './ReactionBubble.svelte';
-  import { playBonk } from '../lib/audio';
+  import { playSelectedBellSound } from '../lib/audio';
   import type { QuotePayload } from '../lib/quote';
   import type { AppSettings } from '../lib/settings';
 
@@ -13,7 +13,6 @@
   export let reaction = '';
   export let settings: AppSettings;
   export let showQuote = true;
-  export let showTapMessage = true;
 
   $: petSize = settings?.pet_size ?? 145;
   $: quoteFontSize = settings?.font_size ?? 17;
@@ -84,13 +83,8 @@
   });
 
   async function bonk() {
-    if (showTapMessage) {
-      reaction = 'A-di-đà Phật.';
-      window.setTimeout(() => {
-        reaction = '';
-      }, 1800);
-    }
-    playBonk();
+    reaction = '';
+    playSelectedBellSound(settings.bell_sound, settings.bell_volume, settings.bell_repeat_count);
 
     try {
       const next = await invoke<QuotePayload>('get_next_quote', { currentId: quote?.id || '' });

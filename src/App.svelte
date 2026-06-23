@@ -5,7 +5,7 @@
   import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
   import PetWindow from './components/PetWindow.svelte';
   import SettingsWindow from './components/SettingsWindow.svelte';
-  import { playBell, playBonk } from './lib/audio';
+  import { playSelectedBellSound } from './lib/audio';
   import type { QuotePayload } from './lib/quote';
   import { defaultSettings, type AppSettings } from './lib/settings';
 
@@ -44,11 +44,7 @@
 
         if (hasInitialized) {
           if (settings.bell_sound_enabled) {
-            if (settings.bell_sound === 'bonk') {
-              playBonk(settings.bell_volume);
-            } else {
-              playBell(settings.bell_volume, settings.bell_repeat_count);
-            }
+            playSelectedBellSound(settings.bell_sound, settings.bell_volume, settings.bell_repeat_count);
           }
         } else {
           hasInitialized = true;
@@ -57,11 +53,7 @@
 
       const unlistenBell = await listen('monk:bell', () => {
         if (settings.bell_enabled && settings.bell_sound_enabled) {
-          if (settings.bell_sound === 'bonk') {
-            playBonk(settings.bell_volume);
-          } else {
-            playBell(settings.bell_volume, settings.bell_repeat_count);
-          }
+          playSelectedBellSound(settings.bell_sound, settings.bell_volume, settings.bell_repeat_count);
         }
       });
 
@@ -100,7 +92,6 @@
       bind:reaction
       bind:settings
       showQuote={settings.show_quote}
-      showTapMessage={settings.show_tap_message}
     />
   {/if}
 </div>
