@@ -6,9 +6,9 @@
   export let queueSave: () => void;
 
   const sounds = [
-    { value: 'bell', label: 'Bell' },
+    { value: 'bell', label: 'Chuông' },
     { value: 'bonk', label: 'Mõ' },
-    { value: 'custom', label: 'Custom file' },
+    { value: 'custom', label: 'Tệp âm thanh ngoài' },
   ];
 
   let customSoundInput: HTMLInputElement | null = null;
@@ -82,13 +82,13 @@
 </script>
 
 <div class="section">
-  <div class="section-title">Quote flow</div>
+  <div class="section-title">Luồng câu trích</div>
   <label class="toggle">
-    <span>Show quote on pet</span>
+    <span>Hiện câu trích trên chú tiểu</span>
     <input type="checkbox" bind:checked={draft.show_quote} on:change={queueSave} />
   </label>
   <label class="toggle">
-    <span>Show quote while idle</span>
+    <span>Hiện câu trích khi nhàn rỗi</span>
     <input
       type="checkbox"
       bind:checked={draft.show_idle_message}
@@ -97,20 +97,20 @@
     />
   </label>
   <label>
-    <span>Quote interval</span>
+    <span>Khoảng lặp câu trích</span>
     <input type="range" min="60" max="10800" step="60" bind:value={draft.quote_interval_secs} on:input={queueSave} />
-    <strong>{Math.round(draft.quote_interval_secs / 60)} min</strong>
+    <strong>{Math.round(draft.quote_interval_secs / 60)} phút</strong>
   </label>
 </div>
 
 <div class="section">
   <div class="section-title">Chuông chánh niệm</div>
   <label class="toggle">
-    <span>Mindfulness bell</span>
+    <span>Bật chuông chánh niệm</span>
     <input type="checkbox" bind:checked={draft.bell_enabled} on:change={queueSave} />
   </label>
   <label>
-    <span>Bell interval</span>
+    <span>Khoảng chuông</span>
     <input
       type="range"
       min="1"
@@ -120,24 +120,24 @@
       disabled={!draft.bell_enabled}
       on:input={queueSave}
     />
-    <strong>{draft.bell_interval_minutes} min</strong>
+    <strong>{draft.bell_interval_minutes} phút</strong>
   </label>
   <label class="toggle">
-    <span>Sync message with bell</span>
+    <span>Đồng bộ câu với chuông</span>
     <input type="checkbox" bind:checked={draft.bell_sync_message} disabled={!draft.bell_enabled} on:change={queueSave} />
   </label>
   <label class="toggle">
-    <span>Bell sound</span>
+    <span>Bật âm thanh</span>
     <input type="checkbox" bind:checked={draft.bell_sound_enabled} disabled={!draft.bell_enabled} on:change={queueSave} />
   </label>
   <label>
-    <span>Sound</span>
+    <span>Âm thanh</span>
     <select bind:value={draft.bell_sound} disabled={!draft.bell_enabled || !draft.bell_sound_enabled} on:change={handleSoundChange}>
       {#each sounds as sound}
         <option value={sound.value}>{sound.label}</option>
       {/each}
     </select>
-    <button type="button" class="small" disabled={!draft.bell_sound_enabled} on:click={previewSound}>Preview</button>
+    <button type="button" class="small" disabled={!draft.bell_sound_enabled} on:click={previewSound}>Nghe thử</button>
   </label>
   {#if isCustomSelected}
     <div class="custom-sound-row">
@@ -149,17 +149,17 @@
         on:change={handleCustomSoundChange}
       />
       <div class="custom-sound-meta">
-        <span>{hasCustomSound ? draft.bell_custom_sound_name : 'No custom audio selected yet'}</span>
-        <small>Choose an external audio file to use for this sound.</small>
+        <span>{hasCustomSound ? draft.bell_custom_sound_name : 'Chưa chọn tệp âm thanh ngoài'}</span>
+        <small>Chọn một tệp âm thanh từ máy để dùng cho lựa chọn này.</small>
       </div>
       <div class="custom-sound-actions">
-        <button type="button" class="small" disabled={!draft.bell_sound_enabled} on:click={chooseCustomSound}>Choose file</button>
-        <button type="button" class="small secondary" disabled={!hasCustomSound} on:click={removeCustomSound}>Remove</button>
+        <button type="button" class="small" disabled={!draft.bell_sound_enabled} on:click={chooseCustomSound}>Chọn tệp</button>
+        <button type="button" class="small secondary" disabled={!hasCustomSound} on:click={removeCustomSound}>Gỡ bỏ</button>
       </div>
     </div>
   {/if}
   <label>
-    <span>Volume</span>
+    <span>Âm lượng</span>
     <input
       type="range"
       min="0"
@@ -172,7 +172,7 @@
     <strong>{Math.round(draft.bell_volume * 100)}%</strong>
   </label>
   <label>
-    <span>Repeat</span>
+    <span>Số lần lặp</span>
     <input
       type="number"
       min="1"
@@ -184,13 +184,13 @@
     <strong>{draft.bell_repeat_count}x</strong>
   </label>
   <label class="toggle">
-    <span>Quiet hours</span>
+    <span>Giờ yên lặng</span>
     <input type="checkbox" bind:checked={draft.quiet_hours_enabled} disabled={!draft.bell_enabled} on:change={queueSave} />
   </label>
   {#if draft.quiet_hours_enabled}
     <div class="time-row">
       <label>
-        <span>Start</span>
+        <span>Bắt đầu</span>
         <input
           type="time"
           value={minutesToTime(draft.quiet_hours_start_minutes)}
@@ -201,7 +201,7 @@
         />
       </label>
       <label>
-        <span>End</span>
+        <span>Kết thúc</span>
         <input
           type="time"
           value={minutesToTime(draft.quiet_hours_end_minutes)}

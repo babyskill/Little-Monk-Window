@@ -151,7 +151,7 @@
   }
 
   async function resetVerses() {
-    if (!window.confirm('Reset toàn bộ nội dung về Dhammapada bundle mặc định?')) {
+    if (!window.confirm('Khôi phục toàn bộ nội dung về bộ Dhammapada mặc định?')) {
       return;
     }
 
@@ -186,7 +186,7 @@
   <section class="section">
     <div class="section-title">Cập nhật dữ liệu từ GitHub</div>
     <div class="zip-row">
-      <input bind:value={updateUrl} placeholder="GitHub ZIP URL" disabled={isUpdating} />
+      <input bind:value={updateUrl} placeholder="URL ZIP GitHub" disabled={isUpdating} />
       <button class="primary" disabled={isUpdating || !updateUrl.trim()} on:click={updateFromGithub}>
         {isUpdating ? 'Đang cập nhật...' : 'Cập nhật ngay'}
       </button>
@@ -197,9 +197,9 @@
 
   <section class="section">
     <div class="toolbar">
-      <input bind:value={query} placeholder="Tìm kiếm phẩm/câu" />
+      <input bind:value={query} placeholder="Tìm phẩm / câu" />
       <button class="primary" on:click={startAdd}>Thêm câu</button>
-      <button class="ghost" on:click={resetVerses}>Reset bundle</button>
+      <button class="ghost" on:click={resetVerses}>Khôi phục bộ mặc định</button>
     </div>
 
     <div class="list">
@@ -214,7 +214,7 @@
               <p>{primary(verse).text}</p>
             </div>
             <div class="actions">
-              <button on:click={() => startEdit(verse)}>Edit</button>
+              <button on:click={() => startEdit(verse)}>Sửa</button>
               <button class="danger" on:click={() => deleteVerse(verse)}>Xóa</button>
             </div>
           </article>
@@ -224,7 +224,7 @@
   </section>
 
   <section class="section current">
-    <div class="section-title">Current quote</div>
+    <div class="section-title">Câu hiện tại</div>
     {#if currentQuote}
       <p>{currentQuote.text}</p>
       <span>{currentQuote.chapterTitle} • {currentQuote.translator || 'Kinh Pháp Cú'}</span>
@@ -242,44 +242,44 @@
 
       <div class="fields two">
         <label>
-          <span>Chapter number</span>
+          <span>Số phẩm</span>
           <input type="number" min="1" bind:value={editing.chapterNumber} required />
         </label>
         <label>
-          <span>Verse number</span>
+          <span>Số câu</span>
           <input type="number" min="1" bind:value={editing.verseNumber} required />
         </label>
       </div>
 
       <div class="fields">
         <label>
-          <span>Language</span>
+          <span>Ngôn ngữ</span>
           <select bind:value={editLanguage}>
-            <option value="vi">vi</option>
-            <option value="en">en</option>
+            <option value="vi">Tiếng Việt</option>
+            <option value="en">Tiếng Anh</option>
           </select>
         </label>
         <label>
-          <span>Chapter title</span>
+          <span>Tên phẩm</span>
           <input value={activeTranslation.chapterTitle} on:input={(event) => updateTranslation({ chapterTitle: event.currentTarget.value })} required />
         </label>
         <label>
-          <span>Text</span>
+          <span>Nội dung</span>
           <textarea value={activeTranslation.text} rows="5" on:input={(event) => updateTranslation({ text: event.currentTarget.value })} required></textarea>
         </label>
         <label>
-          <span>Translator</span>
+          <span>Dịch giả</span>
           <input value={activeTranslation.translator} on:input={(event) => updateTranslation({ translator: event.currentTarget.value })} />
         </label>
         <label>
-          <span>Source</span>
+          <span>Nguồn</span>
           <input value={activeTranslation.source} on:input={(event) => updateTranslation({ source: event.currentTarget.value })} />
         </label>
       </div>
 
       <div class="editor-actions">
-        <button type="button" class="ghost" on:click={() => (editMode = null)}>Cancel</button>
-        <button class="primary" type="submit">Save</button>
+        <button type="button" class="ghost" on:click={() => (editMode = null)}>Hủy</button>
+        <button class="primary" type="submit">Lưu</button>
       </div>
     </form>
   </div>

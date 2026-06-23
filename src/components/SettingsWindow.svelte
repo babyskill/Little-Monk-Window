@@ -59,8 +59,8 @@
   <section class="hero">
     <div class="hero-copy">
       <div class="eyebrow">Little Monk</div>
-      <h1>Settings</h1>
-      <p>Adjust the monk, quote cadence, and display style.</p>
+      <h1>Cài đặt</h1>
+      <p>Điều chỉnh chú tiểu, nhịp hiển thị và kiểu trình bày.</p>
     </div>
     <div class="hero-preview">
       <QuoteBubble quote={previewQuote} visible={true} />
@@ -70,36 +70,36 @@
     </div>
   </section>
 
-  <nav class="tabs" aria-label="Settings tabs">
-    <button class:active={tab === 'character'} on:click={() => (tab = 'character')}>Character</button>
-    <button class:active={tab === 'bell'} on:click={() => (tab = 'bell')}>Bell</button>
-    <button class:active={tab === 'content'} on:click={() => (tab = 'content')}>Content</button>
+  <nav class="tabs" aria-label="Các tab cài đặt">
+    <button class:active={tab === 'character'} on:click={() => (tab = 'character')}>Nhân vật</button>
+    <button class:active={tab === 'bell'} on:click={() => (tab = 'bell')}>Chuông</button>
+    <button class:active={tab === 'content'} on:click={() => (tab = 'content')}>Nội dung</button>
   </nav>
 
   <section class="panel">
     {#if tab === 'character'}
       <div class="section">
-        <div class="section-title">Character</div>
+        <div class="section-title">Nhân vật</div>
         <label>
-          <span>Pet size</span>
+          <span>Kích thước chú tiểu</span>
           <input type="range" min="110" max="168" step="1" bind:value={draft.pet_size} on:input={queueSave} />
           <strong>{Math.round(draft.pet_size)} px</strong>
         </label>
         <label>
-          <span>Font size</span>
+          <span>Cỡ chữ</span>
           <input type="range" min="14" max="20" step="1" bind:value={draft.font_size} on:input={queueSave} />
           <strong>{Math.round(draft.font_size)} px</strong>
         </label>
         <label class="toggle">
-          <span>Always on top</span>
+          <span>Luôn ở trên cùng</span>
           <input type="checkbox" bind:checked={draft.always_on_top} on:change={queueSave} />
         </label>
         <label class="toggle">
-          <span>Show quote on pet</span>
+          <span>Hiện câu trích trên chú tiểu</span>
           <input type="checkbox" bind:checked={draft.show_quote} on:change={queueSave} />
         </label>
         <label class="toggle">
-          <span>Show quote while idle</span>
+          <span>Hiện câu trích khi nhàn rỗi</span>
           <input
             type="checkbox"
             bind:checked={draft.show_idle_message}
@@ -112,10 +112,10 @@
       <BellSettings bind:draft {queueSave} />
     {:else}
       <div class="section">
-        <div class="section-title">Content</div>
+        <div class="section-title">Nội dung</div>
         <div class="segmented">
-          <button class:active={draft.quote_language === 'vi'} on:click={() => applyLanguage('vi')}>Vietnamese</button>
-          <button class:active={draft.quote_language === 'en'} on:click={() => applyLanguage('en')}>English</button>
+          <button class:active={draft.quote_language === 'vi'} on:click={() => applyLanguage('vi')}>Tiếng Việt</button>
+          <button class:active={draft.quote_language === 'en'} on:click={() => applyLanguage('en')}>Tiếng Anh</button>
         </div>
         <ContentManager />
       </div>
@@ -123,8 +123,8 @@
   </section>
 
   <footer class="footer">
-    <button class="ghost" on:click={resetDefaults}>Reset defaults</button>
-    <button class="primary" on:click={() => void invoke('update_settings', { next: draft })}>Save</button>
+    <button class="ghost" on:click={resetDefaults}>Khôi phục mặc định</button>
+    <button class="primary" on:click={() => void invoke('update_settings', { next: draft })}>Lưu</button>
   </footer>
 </main>
 
