@@ -11,7 +11,9 @@ export type AppSettings = {
   bell_interval_minutes: number;
   bell_sync_message: boolean;
   bell_sound_enabled: boolean;
-  bell_sound: 'bell' | 'bonk' | string;
+  bell_sound: 'bell' | 'bonk' | 'custom' | string;
+  bell_custom_sound_data: string;
+  bell_custom_sound_name: string;
   bell_volume: number;
   bell_repeat_count: number;
   quiet_hours_enabled: boolean;
@@ -33,6 +35,8 @@ export const defaultSettings: AppSettings = {
   bell_sync_message: true,
   bell_sound_enabled: true,
   bell_sound: 'bell',
+  bell_custom_sound_data: '',
+  bell_custom_sound_name: '',
   bell_volume: 0.75,
   bell_repeat_count: 1,
   quiet_hours_enabled: false,

@@ -7,8 +7,13 @@
 
   const sounds = [
     { value: 'bell', label: 'Bell' },
-    { value: 'bonk', label: 'Bonk' },
+    { value: 'bonk', label: 'Mõ' },
+    { value: 'custom', label: 'Custom file' },
   ];
+
+  let customSoundInput: HTMLInputElement | null = null;
+  let hasCustomSound = false;
+  let isCustomSelected = false;
 
   function minutesToTime(minutes: number) {
     const hour = Math.floor(minutes / 60).toString().padStart(2, '0');
@@ -22,8 +27,58 @@
   }
 
   function previewSound() {
-    playSelectedBellSound(draft.bell_sound, draft.bell_volume, draft.bell_repeat_count);
+    playSelectedBellSound(
+      draft.bell_sound,
+      draft.bell_volume,
+      draft.bell_repeat_count,
+      draft.bell_custom_sound_data
+    );
   }
+
+  async function handleCustomSoundChange(event: Event) {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ''));
+      reader.onerror = () => reject(reader.error ?? new Error('Failed to read custom audio file'));
+      reader.readAsDataURL(file);
+    });
+
+    draft.bell_sound = 'custom';
+    draft.bell_custom_sound_data = dataUrl;
+    draft.bell_custom_sound_name = file.name;
+    queueSave();
+  }
+
+  function chooseCustomSound() {
+    customSoundInput?.click();
+  }
+
+  function handleSoundChange() {
+    queueSave();
+    if (draft.bell_sound === 'custom' && !draft.bell_custom_sound_data) {
+      chooseCustomSound();
+    }
+  }
+
+  function removeCustomSound() {
+    draft.bell_custom_sound_data = '';
+    draft.bell_custom_sound_name = '';
+    if (draft.bell_sound === 'custom') {
+      draft.bell_sound = 'bell';
+    }
+    queueSave();
+  }
+
+  $: hasCustomSound = Boolean(draft.bell_custom_sound_data);
+  $: isCustomSelected = draft.bell_sound === 'custom';
+
 </script>
 
 <div class="section">
@@ -77,13 +132,32 @@
   </label>
   <label>
     <span>Sound</span>
-    <select bind:value={draft.bell_sound} disabled={!draft.bell_enabled || !draft.bell_sound_enabled} on:change={queueSave}>
+    <select bind:value={draft.bell_sound} disabled={!draft.bell_enabled || !draft.bell_sound_enabled} on:change={handleSoundChange}>
       {#each sounds as sound}
         <option value={sound.value}>{sound.label}</option>
       {/each}
     </select>
-    <button class="small" disabled={!draft.bell_sound_enabled} on:click={previewSound}>Preview</button>
+    <button type="button" class="small" disabled={!draft.bell_sound_enabled} on:click={previewSound}>Preview</button>
   </label>
+  {#if isCustomSelected}
+    <div class="custom-sound-row">
+      <input
+        bind:this={customSoundInput}
+        type="file"
+        accept="audio/*"
+        hidden
+        on:change={handleCustomSoundChange}
+      />
+      <div class="custom-sound-meta">
+        <span>{hasCustomSound ? draft.bell_custom_sound_name : 'No custom audio selected yet'}</span>
+        <small>Choose an external audio file to use for this sound.</small>
+      </div>
+      <div class="custom-sound-actions">
+        <button type="button" class="small" disabled={!draft.bell_sound_enabled} on:click={chooseCustomSound}>Choose file</button>
+        <button type="button" class="small secondary" disabled={!hasCustomSound} on:click={removeCustomSound}>Remove</button>
+      </div>
+    </div>
+  {/if}
   <label>
     <span>Volume</span>
     <input
@@ -203,6 +277,44 @@
   .small:disabled {
     cursor: default;
     opacity: 0.45;
+  }
+
+  .small.secondary {
+    background: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .custom-sound-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .custom-sound-meta {
+    display: grid;
+    gap: 4px;
+  }
+
+  .custom-sound-meta span {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .custom-sound-meta small {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.58);
+  }
+
+  .custom-sound-actions {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .time-row {

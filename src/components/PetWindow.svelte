@@ -84,7 +84,12 @@
 
   async function bonk() {
     reaction = '';
-    playSelectedBellSound(settings.bell_sound, settings.bell_volume, settings.bell_repeat_count);
+    playSelectedBellSound(
+      settings.bell_sound,
+      settings.bell_volume,
+      settings.bell_repeat_count,
+      settings.bell_custom_sound_data
+    );
 
     try {
       const next = await invoke<QuotePayload>('get_next_quote', { currentId: quote?.id || '' });

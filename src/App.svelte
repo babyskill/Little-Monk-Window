@@ -44,7 +44,12 @@
 
         if (hasInitialized) {
           if (settings.bell_sound_enabled) {
-            playSelectedBellSound(settings.bell_sound, settings.bell_volume, settings.bell_repeat_count);
+            playSelectedBellSound(
+              settings.bell_sound,
+              settings.bell_volume,
+              settings.bell_repeat_count,
+              settings.bell_custom_sound_data
+            );
           }
         } else {
           hasInitialized = true;
@@ -53,7 +58,12 @@
 
       const unlistenBell = await listen('monk:bell', () => {
         if (settings.bell_enabled && settings.bell_sound_enabled) {
-          playSelectedBellSound(settings.bell_sound, settings.bell_volume, settings.bell_repeat_count);
+          playSelectedBellSound(
+            settings.bell_sound,
+            settings.bell_volume,
+            settings.bell_repeat_count,
+            settings.bell_custom_sound_data
+          );
         }
       });
 
