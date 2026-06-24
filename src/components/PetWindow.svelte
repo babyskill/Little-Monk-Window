@@ -56,8 +56,8 @@
 
   function handleContextMenu(event: MouseEvent) {
     event.preventDefault();
-    const menuWidth = 190;
-    const menuHeight = 220;
+    const menuWidth = 220;
+    const menuHeight = 270;
     menuX = Math.min(event.clientX, 430 - menuWidth - 10);
     menuY = Math.min(event.clientY, 380 - menuHeight - 10);
     showMenu = true;
@@ -218,6 +218,19 @@
         </div>
         <div class="menu-slider">
           <label>
+            <span>Text:</span>
+            <input
+              type="range"
+              min="14"
+              max="20"
+              step="1"
+              bind:value={settings.font_size}
+              on:input={saveQuickSettings}
+            />
+          </label>
+        </div>
+        <div class="menu-slider">
+          <label>
             <span>Vol:</span>
             <input
               type="range"
@@ -298,7 +311,7 @@
   .context-menu {
     position: fixed;
     z-index: 100;
-    width: 190px;
+    width: 220px;
     background: rgba(25, 27, 39, 0.94);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
