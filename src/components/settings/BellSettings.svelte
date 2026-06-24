@@ -187,32 +187,35 @@
     <span>Giờ yên lặng</span>
     <input type="checkbox" bind:checked={draft.quiet_hours_enabled} on:change={queueSave} />
   </label>
-  {#if draft.quiet_hours_enabled}
-    <div class="time-row">
-      <label>
-        <span>Bắt đầu</span>
-        <input
-          type="time"
-          value={minutesToTime(draft.quiet_hours_start_minutes)}
-          on:change={(event) => {
-            draft.quiet_hours_start_minutes = timeToMinutes(event.currentTarget.value);
-            queueSave();
-          }}
-        />
-      </label>
-      <label>
-        <span>Kết thúc</span>
-        <input
-          type="time"
-          value={minutesToTime(draft.quiet_hours_end_minutes)}
-          on:change={(event) => {
-            draft.quiet_hours_end_minutes = timeToMinutes(event.currentTarget.value);
-            queueSave();
-          }}
-        />
-      </label>
-    </div>
-  {/if}
+  <div class="time-row">
+    <label class="time-field">
+      <span>Bắt đầu</span>
+      <input
+        type="time"
+        value={minutesToTime(draft.quiet_hours_start_minutes)}
+        disabled={!draft.quiet_hours_enabled}
+        on:change={(event) => {
+          draft.quiet_hours_start_minutes = timeToMinutes(event.currentTarget.value);
+          queueSave();
+        }}
+      />
+    </label>
+    <label class="time-field">
+      <span>Kết thúc</span>
+      <input
+        type="time"
+        value={minutesToTime(draft.quiet_hours_end_minutes)}
+        disabled={!draft.quiet_hours_enabled}
+        on:change={(event) => {
+          draft.quiet_hours_end_minutes = timeToMinutes(event.currentTarget.value);
+          queueSave();
+        }}
+      />
+    </label>
+  </div>
+  <p class="quiet-hours-help">
+    Bật giờ yên lặng để các mốc thời gian này có hiệu lực.
+  </p>
 </div>
 
 <style>
@@ -323,7 +326,13 @@
     gap: 12px;
   }
 
-  .time-row label {
+  .time-field {
     grid-template-columns: 70px 1fr;
+  }
+
+  .quiet-hours-help {
+    margin: -4px 0 0;
+    color: rgba(255, 255, 255, 0.56);
+    font-size: 12px;
   }
 </style>
