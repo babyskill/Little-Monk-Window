@@ -13,6 +13,7 @@
 
   let tab: 'character' | 'bell' | 'content' = 'character';
   let draft: AppSettings = { ...defaultSettings };
+  let lastAppliedSettingsJson = '';
   let saveTimer: number | null = null;
   let ready = false;
 
@@ -28,11 +29,16 @@
 
   onMount(() => {
     draft = { ...settings };
+    lastAppliedSettingsJson = JSON.stringify(settings);
     ready = true;
   });
 
-  $: if (ready && JSON.stringify(settings) !== JSON.stringify(draft)) {
-    draft = { ...settings };
+  $: if (ready) {
+    const nextSettingsJson = JSON.stringify(settings);
+    if (nextSettingsJson !== lastAppliedSettingsJson) {
+      draft = { ...settings };
+      lastAppliedSettingsJson = nextSettingsJson;
+    }
   }
 
   function queueSave() {
