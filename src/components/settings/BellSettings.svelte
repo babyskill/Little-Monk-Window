@@ -185,7 +185,7 @@
   </label>
   <label class="toggle">
     <span>Giờ yên lặng</span>
-    <input type="checkbox" bind:checked={draft.quiet_hours_enabled} disabled={!draft.bell_enabled} on:change={queueSave} />
+    <input type="checkbox" bind:checked={draft.quiet_hours_enabled} on:change={queueSave} />
   </label>
   {#if draft.quiet_hours_enabled}
     <div class="time-row">
