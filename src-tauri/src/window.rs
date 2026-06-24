@@ -1,12 +1,20 @@
 use tauri::{AppHandle, Manager, WebviewWindow};
 
+#[cfg(target_os = "macos")]
 pub fn set_accessory_activation_policy(app: &AppHandle) {
     let _ = app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 }
 
+#[cfg(not(target_os = "macos"))]
+pub fn set_accessory_activation_policy(_app: &AppHandle) {}
+
+#[cfg(target_os = "macos")]
 pub fn set_regular_activation_policy(app: &AppHandle) {
     let _ = app.set_activation_policy(tauri::ActivationPolicy::Regular);
 }
+
+#[cfg(not(target_os = "macos"))]
+pub fn set_regular_activation_policy(_app: &AppHandle) {}
 
 pub fn configure_main_window(app: &AppHandle, always_on_top: bool) {
     if let Some(window) = app.get_webview_window("pet") {
