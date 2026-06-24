@@ -132,7 +132,7 @@
   </label>
   <label>
     <span>Âm thanh</span>
-    <select bind:value={draft.bell_sound} disabled={!draft.bell_enabled || !draft.bell_sound_enabled} on:change={handleSoundChange}>
+    <select bind:value={draft.bell_sound} disabled={!draft.bell_sound_enabled} on:change={handleSoundChange}>
       {#each sounds as sound}
         <option value={sound.value}>{sound.label}</option>
       {/each}
@@ -166,7 +166,7 @@
       max="1"
       step="0.01"
       bind:value={draft.bell_volume}
-      disabled={!draft.bell_enabled || !draft.bell_sound_enabled}
+      disabled={!draft.bell_sound_enabled}
       on:input={queueSave}
     />
     <strong>{Math.round(draft.bell_volume * 100)}%</strong>
@@ -178,7 +178,7 @@
       min="1"
       max="10"
       bind:value={draft.bell_repeat_count}
-      disabled={!draft.bell_enabled || !draft.bell_sound_enabled}
+      disabled={!draft.bell_sound_enabled}
       on:change={queueSave}
     />
     <strong>{draft.bell_repeat_count}x</strong>
