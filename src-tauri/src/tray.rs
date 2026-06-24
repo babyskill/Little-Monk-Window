@@ -25,10 +25,11 @@ pub fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
         .build()?;
 
     let menu = MenuBuilder::new(app).item(&submenu).build()?;
-    let icon: Image<'static> = tauri::include_image!("icons/icon.png");
+    let icon: Image<'static> = tauri::include_image!("icons/menu-icon.png");
 
     TrayIconBuilder::new()
         .icon(icon)
+        .icon_as_template(true)
         .menu(&menu)
         .tooltip("Little Monk Window")
         .show_menu_on_left_click(false)

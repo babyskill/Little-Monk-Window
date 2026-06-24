@@ -206,6 +206,7 @@ fn main() {
                 .map(|guard| guard.clone())
                 .unwrap_or_default();
             let _ = settings::save_settings(&current);
+            window::set_accessory_activation_policy(&app_handle);
             window::configure_main_window(&app_handle, current.always_on_top);
             window::configure_settings_window(&app_handle);
             tray::setup_tray(&app_handle)?;
@@ -221,6 +222,12 @@ fn main() {
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();
+                if window.label() == "settings" {
+                    let app = window.app_handle();
+                    let _ = window.hide();
+                    window::set_accessory_activation_policy(&app);
+                    return;
+                }
                 let _ = window.hide();
             }
         })

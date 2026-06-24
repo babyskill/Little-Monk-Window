@@ -1,5 +1,13 @@
 use tauri::{AppHandle, Manager, WebviewWindow};
 
+pub fn set_accessory_activation_policy(app: &AppHandle) {
+    let _ = app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+}
+
+pub fn set_regular_activation_policy(app: &AppHandle) {
+    let _ = app.set_activation_policy(tauri::ActivationPolicy::Regular);
+}
+
 pub fn configure_main_window(app: &AppHandle, always_on_top: bool) {
     if let Some(window) = app.get_webview_window("pet") {
         toggle_click_through(&window, false);
@@ -29,6 +37,7 @@ pub fn set_window_visible(app: &AppHandle, visible: bool) {
 }
 
 pub fn show_settings_window(app: &AppHandle) {
+    set_regular_activation_policy(app);
     if let Some(window) = app.get_webview_window("settings") {
         let _ = window.show();
         let _ = window.set_focus();
