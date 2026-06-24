@@ -3,8 +3,8 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      release_id:
-        description: Existing GitHub Release ID to upload artifacts to
+      tag_name:
+        description: Existing GitHub release tag to upload artifacts to
         required: true
         type: string
   push:
@@ -36,7 +36,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseId: ${{ github.event_name == 'workflow_dispatch' && inputs.release_id || '' }}
+          tagName: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
           releaseDraft: false
           prerelease: false
